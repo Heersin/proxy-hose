@@ -1,5 +1,7 @@
 #include "utils.h"
 
+GLOBAL_MODE_FLAGS = 0x00;
+
 int readn(int fd, void *buf, int n)
 {
 	int nread, left = n;

@@ -124,7 +124,7 @@ typedef struct SOCKS5_REQUEST_PACK* Socks5RequestPacket;
 typedef struct SOCKS5_RESPONSE_PACK* Socks5ResponsePacket;
 
 // =========== request packet ===============
-Socks5RequestPacket  init_socks5_request_pack();
+Socks5RequestPacket  init_socks5_request_pack(void);
 Socks5RequestPacket  make_socks5_request_from_fd(int fd);
 void free_socks5_request_pack(Socks5RequestPacket packet);
 // define getter and setter
@@ -132,11 +132,13 @@ unsigned char get_version_socks5req(Socks5RequestPacket packet);
 unsigned char get_cmd_socks5req(Socks5RequestPacket packet);
 unsigned char get_atype_socks5req(Socks5RequestPacket packet);
 unsigned short get_port_socks5req(Socks5RequestPacket packet);
-unsigned char *get_addr_socks5req(Socks5RequestPacket packet);
+char *get_addr_socks5req(Socks5RequestPacket packet);
 
 
 // =========== response packet ===============
-Socks5ResponsePacket init_socks5_response_pack();
+Socks5ResponsePacket init_socks5_response_pack(void);
+Socks5ResponsePacket make_socks5_response_pack(unsigned char rep_code, unsigned char atype, char *addr, unsigned short port);
+
 unsigned char send_socks5_response_to_fd(Socks5ResponsePacket packet, int fd);
 void free_socks5_response_pack(Socks5ResponsePacket packet);
 // define getter and setter
@@ -145,6 +147,8 @@ void set_rep_socks5res(Socks5ResponsePacket packet, unsigned char rep);
 void set_atype_socks5res(Socks5ResponsePacket packet, unsigned char atype);
 void set_port_socks5res(Socks5ResponsePacket packet, unsigned short port);
 void set_addr_socks5res(Socks5ResponsePacket packet, char *addr);
+
+
 
 
 #endif
