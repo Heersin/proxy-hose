@@ -106,7 +106,7 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
     // test if the server is ok
     if(is_as_relay_server()){
         // set response and waiting connection
-        return _socks5_handle_transfer(request, empty_response);
+        return socks5_relay_server(request, empty_response);
     }
 
     // use remote relay server
@@ -121,6 +121,8 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
     port = split_addr_port(addrport + 1, relay_addr);
     relay_fd = socks5_handle_connection(atype, relay_addr, port);
 
+    // set, but do nothing, the upper layer will send it
+    // realy server is dead
     if(relay_fd == -1){
         set_rep_socks5res(empty_response, REP_REJECT);
         return HANDLE_FAIL;
@@ -138,8 +140,3 @@ static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5Response
     // TODO: pass
     return 0x00;
 }
-
-
-
-// passing data, as a relay server
-static unsigned char _socks5_handle_transfer(Socks5RequestPacket request, Socks5ResponsePacket response);

@@ -13,6 +13,7 @@
 
 #include "socks_pack.h"
 #include "connect.h"
+#include "socks_relay.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -49,13 +50,6 @@ static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5Response
 
 
 
-/*======================================================*/
-/*                                                      */
-/*================ Transfer Issue ======================*/
-/*                                                      */
-/*======================================================*/
-// passing data
-static unsigned char _socks5_handle_transfer(Socks5RequestPacket request, Socks5ResponsePacket response);
 
 // return a string contains addr and port
 // Format : addr:port
