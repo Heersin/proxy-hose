@@ -62,15 +62,15 @@ static unsigned char _socks5_handle_cmd(int fd, Socks5RequestPacket request)
     switch (cmd)
     {
     case CMD_CONNECT:
-        rep_code = _socks5_cmd_connect(request, empty_response);
+        rep_code = _socks5_cmd_connect(request, empty_response, fd);
         break;
     
     case CMD_BIND:
-        rep_code = _socks5_cmd_bind(request, empty_response);
+        rep_code = _socks5_cmd_bind(request, empty_response,fd);
         break;
     
     case CMD_UDP:
-        rep_code = _socks5_cmd_udp(request, empty_response);
+        rep_code = _socks5_cmd_udp(request, empty_response,fd);
         break;
 
     default:
@@ -79,12 +79,16 @@ static unsigned char _socks5_handle_cmd(int fd, Socks5RequestPacket request)
         break;
     }
 
-    // free the request related
+    // use remote addr as relay server
+    if((!is_as_relay_server()) || (rep_code == REP_UNSUPPORTCMD)){
+        set_rep_socks5res(empty_response, rep_code);
+        send_socks5_response_to_fd(empty_response, fd);
+    } // else do nothing, send action is done by the relay server procedure in _socks_cmd_xxx()
+
+    // no matter how, free the request and response, and close fd
     free_socks5_request_pack(request);
-    
-    // send  response -> client and then destroy
-    send_socks5_response_to_fd(empty_response, fd);
     free_socks5_response_pack(empty_response);
+    close(fd);
 
     // if rep is fail, then inform our socks server that the handle procedure is failed
     if(rep_code != REP_SUCCESS)
@@ -94,19 +98,23 @@ static unsigned char _socks5_handle_cmd(int fd, Socks5RequestPacket request)
 }
 
 // diffrent command
-static unsigned char _socks5_cmd_bind(Socks5RequestPacket request, Socks5ResponsePacket empty_response)
+static unsigned char _socks5_cmd_bind(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd)
 {
     // TODO: pass
-    return 0x00;
+    // if I want to implement the bind
+    // then I should implement a table to store the connect to our socks server
+    // because in RFC, "BIND" required an existing connection create by cmd "CONNECT"
+    return REP_UNSUPPORTCMD;
 }
 
-static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5ResponsePacket empty_response)
+static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd)
 {
     // TODO : passportaddr
     // test if the server is ok
     if(is_as_relay_server()){
         // set response and waiting connection
-        return socks5_relay_server(request, empty_response);
+        // may create a process to handle relay
+        return socks5_start_relay_server(request, empty_response);
     }
 
     // use remote relay server
@@ -125,18 +133,27 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
     // realy server is dead
     if(relay_fd == -1){
         set_rep_socks5res(empty_response, REP_REJECT);
-        return HANDLE_FAIL;
+        return REP_REJECT;
     }
+
+    // close test connection
+    close(relay_fd);
 
     set_atype_socks5res(empty_response, atype);
     set_rep_socks5res(empty_response, REP_SUCCESS);
     set_addr_socks5res(empty_response, relay_addr);
     set_port_socks5res(empty_response, port);
-    return HANDLE_SUCCESS;
+    return REP_SUCCESS;
 }
 
-static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5ResponsePacket empty_response)
+static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd)
 {
-    // TODO: pass
+    if(is_as_relay_server()){
+        return socks5_start_relay_server(request, empty_response);
+    }
+
+    // 
+    // 
+
     return 0x00;
 }

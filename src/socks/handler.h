@@ -44,9 +44,9 @@ unsigned char socks5_handle(void *fd);
 static unsigned char _socks5_handle_cmd(int fd, Socks5RequestPacket request);
 
 // diffrent command
-static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5ResponsePacket empty_response);
-static unsigned char _socks5_cmd_bind(Socks5RequestPacket request, Socks5ResponsePacket empty_response);
-static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5ResponsePacket empty_response);
+static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd);
+static unsigned char _socks5_cmd_bind(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd);
+static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd);
 
 
 
