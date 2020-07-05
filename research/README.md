@@ -1,7 +1,51 @@
 # Proxy
 
-开发中
+暂停开发
+
+## 写给自己的源码说明
+```
+├─readme.md
+├─research/
+│ ├─clash.pcapng
+│ └─README.md
+└─src/
+  ├─main.c
+  ├─proxy.c
+  ├─relay/
+  ├─socks/
+  │ ├─auth.c
+  │ ├─auth.h
+  │ ├─connect.c
+  │ ├─connect.h
+  │ ├─handler.c
+  │ ├─handler.h
+  │ ├─socks_mod.c
+  │ ├─socks_mod.h
+  │ ├─socks_pack.c
+  │ ├─socks_pack.h
+  │ ├─socks_relay.c
+  │ └─socks_relay.h
+  ├─test/
+  │ ├─socks5_parse.c
+  │ └─socks5_parse.h
+  └─utils/
+    ├─utils.c
+    └─utils.h
+```
+* socks_mod.c -- socks5_main
+  * auth.c -- the socks auth part
+  * handler.c -- auth done, then handle the communication between socks client and server
+    * socks_relay.c -- use this socks server as relay server (Bad implement)
+  * connect.h -- handle the tcp connection and udp, return the fd
+  * socks_pack -- structs of SOCKS request and response,socks UDP Header
+
+* main.c -- the main function, which parse command line and call proxy
+  * proxy.c -- the callee function, and create thread
+
+* utils.c -- some utils
+* test -- c file test, not important
 ## Socks
+
 
 ## Http
 
