@@ -120,6 +120,12 @@ enum SOCK_ATYP_TYPE{
     ATYP_IPV6 = 0x04
 };
 
+
+
+/************************************************************************
+ *                              Request & Response                      *
+ ************************************************************************/
+
 typedef struct SOCKS5_REQUEST_PACK* Socks5RequestPacket;
 typedef struct SOCKS5_RESPONSE_PACK* Socks5ResponsePacket;
 
@@ -149,6 +155,24 @@ void set_port_socks5res(Socks5ResponsePacket packet, unsigned short port);
 void set_addr_socks5res(Socks5ResponsePacket packet, char *addr);
 
 
+/************************************************************************
+ *                              UDP Encapsulate                         *
+ ************************************************************************/
+typedef struct SOCKS5_UDP_HEADER *Socks5UdpHdr;
+Socks5UdpHdr init_socks5_udp_pack(void);
+Socks5UdpHdr mkae_socks5_udp_from_fd(int fd);
+Socks5UdpHdr make_socks5_udp_pack(unsigned char atype, char *addr, unsigned short port, char *databuf);
+void free_socks5_udp_pack(Socks5UdpHdr packet);
 
+void set_atype_socks5udp(Socks5UdpHdr packet, unsigned short atype);
+void set_addr_socks5udp(Socks5UdpHdr packet, char *addr);
+void set_port_socks5udp(Socks5UdpHdr packet, unsigned short port);
+void set_data_socks5udp(Socks5UdpHdr packet, char *databuf);
+
+unsigned char get_atype_socks5udp(Socks5UdpHdr packet);
+char *get_addr_socks5udp(Socks5UdpHdr packet);
+unsigned short get_port_socks5udp(Socks5UdpHdr packet);
+char *get_databuf_socks5udp(Socks5UdpHdr packet);
+unsigned char get_frag_socks5udp(Socks5UdpHdr packet);
 
 #endif

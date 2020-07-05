@@ -25,6 +25,15 @@ struct SOCKS5_RESPONSE_PACK
     char *bind_addr;
 };
 
+struct SOCKS5_UDP_HEADER
+{
+    unsigned short rsv;
+    unsigned short port;
+    unsigned char frag;
+    unsigned char atype;
+    char *addr;
+    char *databuf;
+};
 
 Socks5ResponsePacket init_socks5_response_pack()
 {

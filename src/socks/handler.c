@@ -66,11 +66,11 @@ static unsigned char _socks5_handle_cmd(int fd, Socks5RequestPacket request)
         break;
     
     case CMD_BIND:
-        rep_code = _socks5_cmd_bind(request, empty_response,fd);
+        rep_code = _socks5_cmd_bind(request, empty_response, fd);
         break;
     
     case CMD_UDP:
-        rep_code = _socks5_cmd_udp(request, empty_response,fd);
+        rep_code = _socks5_cmd_udp(request, empty_response, fd);
         break;
 
     default:
@@ -114,7 +114,7 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
     if(is_as_relay_server()){
         // set response and waiting connection
         // may create a process to handle relay
-        return socks5_start_relay_server(request, empty_response);
+        return socks5_start_relay_server(request, empty_response, fd);
     }
 
     // use remote relay server
@@ -138,6 +138,7 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
 
     // close test connection
     close(relay_fd);
+    free(addrport);
 
     set_atype_socks5res(empty_response, atype);
     set_rep_socks5res(empty_response, REP_SUCCESS);
@@ -149,11 +150,35 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
 static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5ResponsePacket empty_response, int fd)
 {
     if(is_as_relay_server()){
-        return socks5_start_relay_server(request, empty_response);
+        return socks5_start_udp_server(request, empty_response, fd);
+    }
+       
+    // use remote relay server
+    malloc_string addrport;
+    char *relay_addr;
+    unsigned short port;
+    unsigned char atype;
+    int relay_fd;
+
+    addrport = _load_udp_server_config(NULL);
+    atype = addrport[0];
+    port = split_addr_port(addrport + 1, relay_addr);
+    relay_fd = socks5_handle_connection(atype, relay_addr, port);
+
+    // set, but do nothing, the upper layer will send it
+    // if the realy server is dead, treat as rep_reject
+    if(relay_fd == -1){
+        set_rep_socks5res(empty_response, REP_REJECT);
+        return REP_REJECT;
     }
 
-    // 
-    // 
+    // close test connection
+    close(relay_fd);
+    free(addrport);
 
-    return 0x00;
+    set_atype_socks5res(empty_response, atype);
+    set_rep_socks5res(empty_response, REP_SUCCESS);
+    set_addr_socks5res(empty_response, relay_addr);
+    set_port_socks5res(empty_response, port);
+    return REP_SUCCESS;
 }

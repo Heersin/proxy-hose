@@ -56,5 +56,5 @@ static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5Response
 // Example : 127.0.0.1:8080
 // default path : ~/.phose_cfg.conf
 static malloc_string _load_relay_server_config(char *config);
-
+static malloc_string _load_udp_server_config(char *config);
 #endif

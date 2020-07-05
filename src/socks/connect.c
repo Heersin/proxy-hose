@@ -57,7 +57,7 @@ static int _socks5_connect_ipv4(char *addrbuf, unsigned short port)
 	if (connect(fd, (struct sockaddr *)&remote, sizeof(remote)) < 0) {
 			printf("Error : connect() in ipv4 connect");
 			close(fd);
-			return -1;
+			return CONNECT_REJECT_ERROR;
 	}
 	return fd;
 }
@@ -77,7 +77,7 @@ static int _socks5_connect_domain(char *addrbuf, unsigned short port)
     // should use _GNU_SOURCE_ to get its info in Vscode
     // find a possible connection to this domain
 	if (ret == EAI_NODATA) {
-			return -1;
+			return CONNECT_HOST_ERROR;
 	} else if (ret == 0)
     {
 		struct addrinfo *r;
@@ -100,13 +100,15 @@ static int _socks5_connect_domain(char *addrbuf, unsigned short port)
                 close(fd);
             }
 		}
+
+        return CONNECT_REJECT_ERROR;
 	}
     
 }
 
 // handle the socks connect by diffrent addr type
 // return the connection fd
-int _socks5_handle_connection(unsigned char addr_type, char *addrbuf, unsigned short port)
+int socks5_handle_connection(unsigned char addr_type, char *addrbuf, unsigned short port)
 {
     switch (addr_type)
     {
@@ -127,7 +129,14 @@ int _socks5_handle_connection(unsigned char addr_type, char *addrbuf, unsigned s
 
     default:
         // error ?
-        return -1;
+        return CONNECT_FORMAT_ERROR;
         break;
     }
 }
+
+
+
+static int _socks5_sockudp_ipv6(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
+static int _socks5_sockudp_ipv4(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
+static int _socks5_sockudp_domain(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
+int socks5_handle_udpsock(unsigned char addrtype, char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
