@@ -2,6 +2,8 @@
 #define _H_UTILS
 #include <errno.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #define TRUE 0x01
 #define FLASE 0x00
 
@@ -27,6 +29,6 @@ int writen(int fd, void *buf, int n);
 typedef char *malloc_string;
 
 // tricky but bad way I think
-unsigned short split_addr_port(malloc_string addrport, char *bind_addr);
+unsigned short split_addr_port(malloc_string addrport, char **bind_addr_ptr);
 
 #endif

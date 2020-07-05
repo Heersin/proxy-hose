@@ -126,7 +126,7 @@ static unsigned char _socks5_cmd_connect(Socks5RequestPacket request, Socks5Resp
 
     addrport = _load_relay_server_config(NULL);
     atype = addrport[0];
-    port = split_addr_port(addrport + 1, relay_addr);
+    port = split_addr_port(addrport + 1, &relay_addr);
     relay_fd = socks5_handle_connection(atype, relay_addr, port);
 
     // set, but do nothing, the upper layer will send it
@@ -162,7 +162,7 @@ static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5Response
 
     addrport = _load_udp_server_config(NULL);
     atype = addrport[0];
-    port = split_addr_port(addrport + 1, relay_addr);
+    port = split_addr_port(addrport + 1, &relay_addr);
     relay_fd = socks5_handle_connection(atype, relay_addr, port);
 
     // set, but do nothing, the upper layer will send it
@@ -181,4 +181,44 @@ static unsigned char _socks5_cmd_udp(Socks5RequestPacket request, Socks5Response
     set_addr_socks5res(empty_response, relay_addr);
     set_port_socks5res(empty_response, port);
     return REP_SUCCESS;
+}
+
+static malloc_string _load_relay_server_config(char *config)
+{
+    malloc_string addrport;
+
+    addrport = (malloc_string)malloc(256);
+
+    if (config == NULL){
+        addrport[0] = '1';
+        addrport[1] = '1',addrport[2] = '2', addrport[3] = '7', addrport[4] = '.';
+        addrport[5] = '0', addrport[6] = '.';
+        addrport[7] = '0', addrport[8] = '.';
+        addrport[9] = '1';
+        return addrport;
+    }
+
+    printf("No Config Support\n");
+    return addrport;
+}
+
+static malloc_string _load_udp_server_config(char *config)
+{
+        malloc_string addrport;
+
+    addrport = (malloc_string)malloc(256);
+
+    if (config == NULL){
+        addrport[0] = '1';
+        addrport[1] = '1',addrport[2] = '2', addrport[3] = '7', addrport[4] = '.';
+        addrport[5] = '0', addrport[6] = '.';
+        addrport[7] = '0', addrport[8] = '.';
+        addrport[9] = '1';
+        return addrport;
+    }
+
+    
+    printf("No Config Support\n");
+    return addrport;
+
 }

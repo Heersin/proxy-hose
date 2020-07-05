@@ -41,3 +41,26 @@ int writen(int fd, void *buf, int n)
 	}
 	return n;
 }
+
+unsigned short split_addr_port(malloc_string addrport, char **bind_addr_ptr)
+{
+	unsigned short port;
+	malloc_string addr;
+	int addr_len;
+	char *split;
+
+	split = strchr(addrport, ':');
+	addr_len = (int)(addrport - split);
+
+	// set addr
+	addr = (malloc_string)malloc(addr_len + 1);
+	addr[addr_len] = '\0';
+	strncpy(addr, addrport, addr_len);
+
+	// get port num
+	port = (unsigned short)atoi(split + 1);
+
+	// return 
+	*bind_addr_ptr = addr;
+	return port;
+}

@@ -135,8 +135,37 @@ int socks5_handle_connection(unsigned char addr_type, char *addrbuf, unsigned sh
 }
 
 
+// should set up info in the empty sockaddr_in struct!
+static int _socks5_sockudp_ipv6(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr)
+{return CONNECT_REJECT_ERROR;}
+static int _socks5_sockudp_ipv4(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr)
+{return CONNECT_REJECT_ERROR;}
+static int _socks5_sockudp_domain(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr)
+{return CONNECT_REJECT_ERROR;}
 
-static int _socks5_sockudp_ipv6(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
-static int _socks5_sockudp_ipv4(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
-static int _socks5_sockudp_domain(char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
-int socks5_handle_udpsock(unsigned char addrtype, char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr);
+int socks5_handle_udpsock(unsigned char addrtype, char *addrbuf, unsigned short port, struct sockaddr_in *empty_addr)
+{
+    // should set up info in the empty sockaddr_in struct!
+    switch (addrtype)
+    {
+    case ATYP_IPV4:
+        _socks5_setaddr_ipv4(addrbuf);
+        return _socks5_sockudp_ipv4(addrbuf, port, empty_addr);
+        break;
+    
+    case ATYP_IPV6:
+        _socks5_setaddr_ipv6(addrbuf);
+        return _socks5_sockudp_ipv6(addrbuf, port, empty_addr);
+        break;
+
+    case ATYP_DOMAIN:
+        _socks5_setaddr_domain(addrbuf);
+        return _socks5_sockudp_domain(addrbuf, port, empty_addr);
+        break;
+
+    default:
+        // error ?
+        return CONNECT_FORMAT_ERROR;
+        break;
+    }
+}
